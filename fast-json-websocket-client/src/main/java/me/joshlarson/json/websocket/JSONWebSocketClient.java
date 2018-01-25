@@ -1,4 +1,4 @@
-package me.joshlarson.json.websocket.client;
+package me.joshlarson.json.websocket;
 
 import me.joshlarson.json.JSONException;
 import me.joshlarson.json.JSONInputStream;
@@ -7,28 +7,29 @@ import me.joshlarson.json.JSONObject;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.ByteBuffer;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class JSONWebSocket {
+public class JSONWebSocketClient {
 	
 	private final JSONWebSocketImpl impl;
 	private final AtomicReference<JSONWebSocketHandler> handler;
 	
-	public JSONWebSocket() {
+	public JSONWebSocketClient() {
 		this.impl = new JSONWebSocketImpl();
 		this.handler = new AtomicReference<>(null);
 		this.impl.setMessageHandler(new JSONWebSocketImplHandler() {
 			public void onConnect() {
-				JSONWebSocket.this.onConnect();
+				JSONWebSocketClient.this.onConnect();
 			}
 			public void onDisconnect() {
-				JSONWebSocket.this.onDisconnect();
+				JSONWebSocketClient.this.onDisconnect();
 			}
 			public void onMessage(String message) {
-				JSONWebSocket.this.onMessage(message);
+				JSONWebSocketClient.this.onMessage(message);
 			}
 			public void onError(Throwable t) {
-				JSONWebSocket.this.onError(t);
+				JSONWebSocketClient.this.onError(t);
 			}
 		});
 	}
@@ -41,8 +42,24 @@ public class JSONWebSocket {
 		impl.connect(uri);
 	}
 	
+	public void disconnect() throws IOException {
+		impl.disconnect();
+	}
+	
 	public void sendMessage(JSONObject object) {
 		impl.sendMessage(object.toString(true));
+	}
+	
+	public void ping() throws IOException {
+		impl.ping();
+	}
+	
+	public void ping(byte [] data) throws IOException {
+		impl.ping(data);
+	}
+	
+	public void ping(ByteBuffer data) throws IOException {
+		impl.ping(data);
 	}
 	
 	public void setHandler(JSONWebSocketHandler handler) {

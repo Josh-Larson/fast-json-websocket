@@ -1,4 +1,4 @@
-package me.joshlarson.json.websocket.client;
+package me.joshlarson.json.websocket;
 
 public interface JSONWebSocketImplHandler {
 	
