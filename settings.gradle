@@ -1,0 +1,3 @@
+rootProject.name = 'fast-json-websocket'
+include 'fast-json-websocket-server'
+include 'fast-json-websocket-client'

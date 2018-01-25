@@ -1,0 +1,12 @@
+bin/
+build/
+out/
+gen/
+
+.gradle/
+gradle/
+gradle.properties
+gradlew*
+
+.idea/
+.settings/
