@@ -119,6 +119,7 @@ public class JSONWebSocketConnection {
 	 * <pre>{"key":"value"}</pre>
 	 *
 	 * @param object the JSONObject to send
+	 * @throws IOException if an I/O error occurs   
 	 */
 	public void send(JSONObject object) throws IOException {
 		impl.send(object.toString(true));
