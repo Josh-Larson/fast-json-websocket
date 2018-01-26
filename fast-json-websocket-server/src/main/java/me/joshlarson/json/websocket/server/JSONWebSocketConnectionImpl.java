@@ -10,6 +10,7 @@ import org.nanohttpd.protocols.websockets.WebSocketFrame;
 
 import java.io.IOException;
 import java.net.SocketException;
+import java.nio.ByteBuffer;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
@@ -64,7 +65,7 @@ class JSONWebSocketConnectionImpl extends WebSocket {
 	protected void onPong(WebSocketFrame webSocketFrame) {
 		JSONWebSocketConnectionHandler handler = this.handler.get();
 		if (handler != null)
-			handler.onPong(socket);
+			handler.onPong(socket, ByteBuffer.wrap(webSocketFrame.getBinaryPayload()));
 	}
 	
 	@Override

@@ -1,11 +1,11 @@
 package me.joshlarson.json.websocket;
 
 import javax.websocket.*;
+import javax.websocket.CloseReason.CloseCode;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.ByteBuffer;
 import java.util.Random;
-import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicReference;
 
 @ClientEndpoint
@@ -49,9 +49,20 @@ public class JSONWebSocketImpl {
 			session.close();
 	}
 	
+	public void disconnect(CloseCode code, String reason) throws IOException {
+		Session session = this.session.get();
+		if (session != null)
+			session.close(new CloseReason(code, reason));
+	}
+	
 	@OnOpen
 	public void onOpen(Session userSession) {
 		this.session.set(userSession);
+		userSession.addMessageHandler(new MessageHandler.Whole<PongMessage>() {
+			public void onMessage(PongMessage message) {
+				getHandler().onPong(message.getApplicationData());
+			}
+		});
 		getHandler().onConnect();
 	}
 	
@@ -75,7 +86,7 @@ public class JSONWebSocketImpl {
 		this.messageHandler.set(handler);
 	}
 	
-	public void sendMessage(String message) {
+	public void send(String message) {
 		Session session = this.session.get();
 		if (session == null)
 			return;

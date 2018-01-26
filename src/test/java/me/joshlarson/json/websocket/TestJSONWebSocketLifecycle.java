@@ -12,8 +12,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
+import javax.websocket.CloseReason.CloseCodes;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -32,8 +35,10 @@ public class TestJSONWebSocketLifecycle {
 	
 	private final AtomicBoolean connected = new AtomicBoolean(false);
 	private final AtomicBoolean disconnected = new AtomicBoolean(false);
-	private final AtomicInteger pongCount = new AtomicInteger(0);
+	private final AtomicInteger serverPongCount = new AtomicInteger(0);
+	private final AtomicInteger clientPongCount = new AtomicInteger(0);
 	private final AtomicBoolean failed = new AtomicBoolean(false);
+	private final Set<Long> sessionIds = new HashSet<>();
 	
 	private JSONWebSocketServer server;
 	private JSONWebSocketClient client;
@@ -48,7 +53,8 @@ public class TestJSONWebSocketLifecycle {
 		client = new JSONWebSocketClient();
 		connected.set(false);
 		disconnected.set(false);
-		pongCount.set(0);
+		serverPongCount.set(0);
+		clientPongCount.set(0);
 		failed.set(false);
 		setupHandler();
 		
@@ -87,17 +93,17 @@ public class TestJSONWebSocketLifecycle {
 			}
 		};
 		
-		client.sendMessage(new JSONObject());
-		waitForNumber(pongCount, 1);
+		client.send(new JSONObject());
+		waitForNumber(serverPongCount, 1);
 		
 		Assert.assertTrue(received.get());
-		Assert.assertEquals(1, pongCount.get());
+		Assert.assertEquals(1, serverPongCount.get());
 	}
 	
 	@Test
 	public void testServerNoHandler() throws IOException, InterruptedException {
 		server.setHandler(null);
-		client.sendMessage(new JSONObject());
+		client.send(new JSONObject());
 		client.ping();
 		Thread.sleep(100);
 		setupHandler();
@@ -111,7 +117,7 @@ public class TestJSONWebSocketLifecycle {
 				success.set(t instanceof JSONException);
 			}
 		};
-		client.sendMessage(new JSONObject() {
+		client.send(new JSONObject() {
 			public String toString(boolean compact) { // Massive hack to ensure the receive fails
 				return "{invalid{";
 			}
@@ -147,7 +153,7 @@ public class TestJSONWebSocketLifecycle {
 		JSONObject object = new JSONObject();
 		object.put("key", "val");
 		object.put("num", 256);
-		client.sendMessage(object);
+		client.send(object);
 		waitForBoolean(receivedEcho);
 		Assert.assertTrue(receivedEcho.get());
 		Assert.assertTrue(validEcho.get());
@@ -175,16 +181,24 @@ public class TestJSONWebSocketLifecycle {
 				success.set(t instanceof JSONException);
 			}
 		};
-		client.sendMessage(new JSONObject());
+		client.send(new JSONObject());
 		waitForBoolean(success);
 		Assert.assertTrue(success.get());
 	}
 	
 	@Test
 	public void testClientPings() throws IOException {
+		waitForNumber(clientPongCount, 0);
+		Assert.assertEquals(0, clientPongCount.get());
 		client.ping();
+		waitForNumber(clientPongCount, 1);
+		Assert.assertEquals(1, clientPongCount.get());
 		client.ping(new byte[]{1, 2, 3, 4});
+		waitForNumber(clientPongCount, 2);
+		Assert.assertEquals(2, clientPongCount.get());
 		client.ping(ByteBuffer.wrap(new byte[]{5, 6, 7, 8}));
+		waitForNumber(clientPongCount, 3);
+		Assert.assertEquals(3, clientPongCount.get());
 	}
 	
 	@Test
@@ -209,7 +223,7 @@ public class TestJSONWebSocketLifecycle {
 			}
 		};
 		for (int i = 0; i < 512; i++) {
-			client.sendMessage(new JSONObject());
+			client.send(new JSONObject());
 		}
 		waitForBoolean(success);
 		Assert.assertTrue(success.get());
@@ -241,16 +255,43 @@ public class TestJSONWebSocketLifecycle {
 				if (count.getAndIncrement() < 256)
 					return;
 				try {
-					socket.disconnect();
+					socket.disconnect(CloseCodes.CLOSED_ABNORMALLY, "");
 				} catch (IOException e) {
 					e.printStackTrace();
 					failed.set(true);
 				}
 			}
 		};
-		client.sendMessage(new JSONObject());
+		client.send(new JSONObject());
 		waitForBoolean(success);
 		Assert.assertTrue(success.get());
+	}
+	
+	@Test
+	public void testServerConnectionUserData() {
+		final AtomicBoolean firstRun = new AtomicBoolean(true);
+		final AtomicBoolean completed = new AtomicBoolean(false);
+		final AtomicInteger userData = new AtomicInteger(18000);
+		serverMessageHandler = new ServerMessageHandler() {
+			public void onMessage(JSONWebSocketConnection socket, JSONObject object) {
+				if (firstRun.getAndSet(false)) {
+					if (socket.getUserData() != null) {
+						firstRun.set(false);
+						failed.set(true);
+						completed.set(true);
+						return;
+					}
+					socket.setUserData(userData);
+					return;
+				}
+				failed.set(((AtomicInteger) socket.getUserData()).get() != 18000);
+				completed.set(true);
+			}
+		};
+		client.send(new JSONObject());
+		client.send(new JSONObject());
+		waitForBoolean(completed);
+		Assert.assertTrue(completed.get());
 	}
 	
 	private void setupHandler() {
@@ -259,16 +300,21 @@ public class TestJSONWebSocketLifecycle {
 		serverErrorHandler = defaultErrorHandler;
 		clientErrorHandler = defaultErrorHandler;
 		server.setHandler(new JSONWebSocketConnectionHandler() {
-			public void onConnect(JSONWebSocketConnection socket) { connected.set(true); }
+			public void onConnect(JSONWebSocketConnection socket) {
+				connected.set(true);
+				if (!sessionIds.add(socket.getSocketId()))
+					failed.set(true);
+			}
 			public void onDisconnect(JSONWebSocketConnection socket) { disconnected.set(true); }
 			public void onMessage(JSONWebSocketConnection socket, JSONObject object) { serverMessageHandler.onMessage(socket, object); }
-			public void onPong(JSONWebSocketConnection socket) { pongCount.incrementAndGet(); }
+			public void onPong(JSONWebSocketConnection socket, ByteBuffer data) { serverPongCount.incrementAndGet(); }
 			public void onError(JSONWebSocketConnection socket, Throwable t) { serverErrorHandler.onError(t); }
 		});
 		client.setHandler(new JSONWebSocketHandler() {
 			public void onConnect(JSONWebSocketClient socket) { }
 			public void onDisconnect(JSONWebSocketClient socket) { }
 			public void onMessage(JSONWebSocketClient socket, JSONObject object) { clientMessageHandler.onMessage(socket, object); }
+			public void onPong(JSONWebSocketClient socket, ByteBuffer data) { clientPongCount.incrementAndGet(); }
 			public void onError(JSONWebSocketClient socket, Throwable t) { clientErrorHandler.onError(t); }
 		});
 	}

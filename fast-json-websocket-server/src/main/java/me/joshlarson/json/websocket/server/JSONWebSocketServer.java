@@ -15,6 +15,11 @@ public class JSONWebSocketServer extends NanoWSD {
 		this.handler = new AtomicReference<>(null);
 	}
 	
+	/**
+	 * Sets the handler for event notifications
+	 *
+	 * @param handler the new event handler
+	 */
 	public void setHandler(JSONWebSocketConnectionHandler handler) {
 		this.handler.set(handler);
 	}
