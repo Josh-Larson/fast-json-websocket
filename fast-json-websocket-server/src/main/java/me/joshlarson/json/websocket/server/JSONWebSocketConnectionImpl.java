@@ -21,7 +21,7 @@ class JSONWebSocketConnectionImpl extends WebSocket {
 	private final JSONWebSocketConnection socket;
 	private final AtomicBoolean connected;
 	
-	public JSONWebSocketConnectionImpl(IHTTPSession handshakeRequest, AtomicReference<JSONWebSocketConnectionHandler> handler) {
+	JSONWebSocketConnectionImpl(IHTTPSession handshakeRequest, AtomicReference<JSONWebSocketConnectionHandler> handler) {
 		super(handshakeRequest);
 		this.handler = handler;
 		this.socket = new JSONWebSocketConnection(this);
@@ -36,16 +36,28 @@ class JSONWebSocketConnectionImpl extends WebSocket {
 	protected void onOpen() {
 		connected.set(true);
 		JSONWebSocketConnectionHandler handler = this.handler.get();
-		if (handler != null)
-			handler.onConnect(socket);
+		if (handler != null) {
+			try {
+				handler.onConnect(socket);
+			} catch (Throwable t) {
+				System.err.println("Exception in handler's onConnect() function");
+				t.printStackTrace();
+			}
+		}
 	}
 	
 	@Override
 	protected void onClose(CloseCode closeCode, String s, boolean b) {
 		connected.set(false);
 		JSONWebSocketConnectionHandler handler = this.handler.get();
-		if (handler != null)
-			handler.onDisconnect(socket);
+		if (handler != null) {
+			try {
+				handler.onDisconnect(socket);
+			} catch (Throwable t) {
+				System.err.println("Exception in handler's onDisconnect() function");
+				t.printStackTrace();
+			}
+		}
 	}
 	
 	@Override
@@ -53,19 +65,38 @@ class JSONWebSocketConnectionImpl extends WebSocket {
 		JSONWebSocketConnectionHandler handler = this.handler.get();
 		if (handler == null)
 			return;
+		
 		try (JSONInputStream in = new JSONInputStream(webSocketFrame.getTextPayload())) {
 			JSONObject object = in.readObject();
-			handler.onMessage(socket, object);
+			if (object == null)
+				throw new JSONException("Invalid JSON: empty string");
+			try {
+				handler.onMessage(socket, object);
+			} catch (Throwable t) {
+				System.err.println("Exception in handler's onMessage() function");
+				t.printStackTrace();
+			}
 		} catch (JSONException | IOException e) {
-			handler.onError(socket, e);
+			try {
+				handler.onError(socket, e);
+			} catch (Throwable t) {
+				System.err.println("Exception in handler's onError() function");
+				t.printStackTrace();
+			}
 		}
 	}
 	
 	@Override
 	protected void onPong(WebSocketFrame webSocketFrame) {
 		JSONWebSocketConnectionHandler handler = this.handler.get();
-		if (handler != null)
-			handler.onPong(socket, ByteBuffer.wrap(webSocketFrame.getBinaryPayload()));
+		if (handler != null) {
+			try {
+				handler.onPong(socket, ByteBuffer.wrap(webSocketFrame.getBinaryPayload()));
+			} catch (Throwable t) {
+				System.err.println("Exception in handler's onPong() function");
+				t.printStackTrace();
+			}
+		}
 	}
 	
 	@Override
@@ -73,8 +104,14 @@ class JSONWebSocketConnectionImpl extends WebSocket {
 		if (e instanceof SocketException && e.getMessage() != null && e.getMessage().toLowerCase(Locale.US).contains("socket closed"))
 			return;
 		JSONWebSocketConnectionHandler handler = this.handler.get();
-		if (handler != null)
-			handler.onError(socket, e);
+		if (handler != null) {
+			try {
+				handler.onError(socket, e);
+			} catch (Throwable t) {
+				System.err.println("Exception in handler's onError() function");
+				t.printStackTrace();
+			}
+		}
 	}
 	
 }

@@ -16,7 +16,7 @@ public class JSONWebSocketImpl {
 	private final Random random;
 	private final Object connectionMutex;
 	
-	public JSONWebSocketImpl() {
+	JSONWebSocketImpl() {
 		this.messageHandler = new AtomicReference<>(null);
 		this.session = new AtomicReference<>(null);
 		this.random = new Random();
@@ -63,38 +63,60 @@ public class JSONWebSocketImpl {
 				getHandler().onPong(message.getApplicationData());
 			}
 		});
-		getHandler().onConnect();
+		try {
+			getHandler().onConnect();
+		} catch (Throwable user) {
+			System.err.println("Exception in handler's onConnect() function");
+			user.printStackTrace();
+		}
 	}
 	
 	@OnClose
 	public void onClose(Session userSession, CloseReason reason) {
 		this.session.set(null);
-		getHandler().onDisconnect();
+		try {
+			getHandler().onDisconnect();
+		} catch (Throwable user) {
+			System.err.println("Exception in handler's onDisconnect() function");
+			user.printStackTrace();
+		}
 	}
 	
 	@OnMessage
 	public void onMessage(String message) {
-		getHandler().onMessage(message);
+		try {
+			getHandler().onMessage(message);
+		} catch (Throwable user) {
+			System.err.println("Exception in handler's onMessage() function");
+			user.printStackTrace();
+		}
 	}
 	
 	@OnError
 	public void onError(Throwable t) {
-		getHandler().onError(t);
+		try {
+			getHandler().onError(t);
+		} catch (Throwable user) {
+			System.err.println("Exception in handler's onError() function");
+			user.printStackTrace();
+		}
 	}
 	
 	public void setMessageHandler(JSONWebSocketImplHandler handler) {
 		this.messageHandler.set(handler);
 	}
 	
-	public void send(String message) {
+	public boolean send(String message) {
 		Session session = this.session.get();
 		if (session == null)
-			return;
+			return false;
 		try {
 			session.getBasicRemote().sendText(message);
+			return true;
 		} catch (Throwable t) {
 			onError(t);
 		}
+		return false;
 	}
 	
 	public void ping() throws IOException {

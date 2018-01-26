@@ -110,8 +110,8 @@ public class JSONWebSocketClient {
 	 *
 	 * @param object the JSONObject to send
 	 */
-	public void send(JSONObject object) {
-		impl.send(object.toString(true));
+	public boolean send(JSONObject object) {
+		return impl.send(object.toString(true));
 	}
 	
 	/**
@@ -167,6 +167,8 @@ public class JSONWebSocketClient {
 	private void onMessage(String message) {
 		try (JSONInputStream in = new JSONInputStream(message)) {
 			JSONObject object = in.readObject();
+			if (object == null)
+				throw new JSONException("Invalid JSON: empty string");
 			JSONWebSocketHandler handler = this.handler.get();
 			if (handler != null)
 				handler.onMessage(this, object);

@@ -129,6 +129,23 @@ public class TestJSONWebSocketLifecycle {
 	}
 	
 	@Test
+	public void testClientEmptyJSON() {
+		final AtomicBoolean success = new AtomicBoolean(false);
+		serverErrorHandler = new ErrorHandler() {
+			public void onError(Throwable t) {
+				success.set(t instanceof JSONException);
+			}
+		};
+		client.send(new JSONObject() {
+			public String toString(boolean compact) { // Massive hack to ensure the receive fails
+				return "";
+			}
+		});
+		waitForBoolean(success);
+		Assert.assertTrue(success.get());
+	}
+	
+	@Test
 	public void testEchoServer() {
 		final AtomicBoolean receivedEcho = new AtomicBoolean(false);
 		final AtomicBoolean validEcho = new AtomicBoolean(false);
@@ -155,7 +172,7 @@ public class TestJSONWebSocketLifecycle {
 		JSONObject object = new JSONObject();
 		object.put("key", "val");
 		object.put("num", 256);
-		client.send(object);
+		Assert.assertTrue(client.send(object));
 		waitForBoolean(receivedEcho);
 		Assert.assertTrue(receivedEcho.get());
 		Assert.assertTrue(validEcho.get());
@@ -170,6 +187,33 @@ public class TestJSONWebSocketLifecycle {
 					socket.send(new JSONObject() {
 						public String toString(boolean compact) { // Massive hack to ensure the receive fails
 							return "{invalid{";
+						}
+					});
+				} catch (IOException e) {
+					e.printStackTrace();
+					failed.set(true);
+				}
+			}
+		};
+		clientErrorHandler = new ErrorHandler() {
+			public void onError(Throwable t) {
+				success.set(t instanceof JSONException);
+			}
+		};
+		client.send(new JSONObject());
+		waitForBoolean(success);
+		Assert.assertTrue(success.get());
+	}
+	
+	@Test
+	public void testServerEmptyJSON() {
+		final AtomicBoolean success = new AtomicBoolean(false);
+		serverMessageHandler = new ServerMessageHandler() {
+			public void onMessage(JSONWebSocketConnection socket, JSONObject object) {
+				try {
+					socket.send(new JSONObject() {
+						public String toString(boolean compact) { // Massive hack to ensure the receive fails
+							return "";
 						}
 					});
 				} catch (IOException e) {
@@ -229,6 +273,7 @@ public class TestJSONWebSocketLifecycle {
 		}
 		waitForBoolean(success);
 		Assert.assertTrue(success.get());
+		Assert.assertFalse(client.send(new JSONObject()));
 	}
 	
 	@Test
@@ -305,6 +350,8 @@ public class TestJSONWebSocketLifecycle {
 			public void onConnect(JSONWebSocketConnection socket) {
 				connected.set(true);
 				if (!sessionIds.add(socket.getSocketId()))
+					failed.set(true);
+				if (!socket.getRemoteIpAddress().equals("127.0.0.1"))
 					failed.set(true);
 			}
 			public void onDisconnect(JSONWebSocketConnection socket) { disconnected.set(true); }

@@ -4,6 +4,7 @@ import me.joshlarson.json.JSONObject;
 import org.nanohttpd.protocols.websockets.CloseCode;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
@@ -22,6 +23,15 @@ public class JSONWebSocketConnection {
 		this.random = new Random();
 		this.userData = new AtomicReference<>(null);
 		this.socketId = GLOBAL_SOCKET_ID.incrementAndGet();
+	}
+	
+	/**
+	 * Gets the remote IP address
+	 * 
+	 * @return the remote IP address
+	 */
+	public String getRemoteIpAddress() {
+		return impl.getHandshakeRequest().getRemoteIpAddress();
 	}
 	
 	/**

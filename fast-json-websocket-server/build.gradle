@@ -10,7 +10,7 @@ targetCompatibility = 1.7
 
 def pluginGroup = "me.joshlarson"
 def pluginName = "fast-json-websocket-server"
-def pluginVersion = "1.0"
+def pluginVersion = "1.2"
 
 group = pluginGroup
 version = pluginVersion
@@ -31,7 +31,6 @@ jar {
 	baseName = "fast-json-websocket-server"
 	classifier = null
 	version = pluginVersion
-	from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
 }
 
 task sourcesJar(type: Jar, dependsOn: classes) {
@@ -110,9 +109,9 @@ bintray {
 		vcsUrl = 'https://github.com/Josh-Larson/fast-json-websocket.git'
 		version {
 			name = pluginVersion
-			desc = 'Fast JSON Websocket version 1.0'
+			desc = 'Fast JSON Websocket'
 			released = new Date()
-			vcsTag = 'v1.0'
+			vcsTag = 'v' + pluginVersion
 		}
 	}
 }

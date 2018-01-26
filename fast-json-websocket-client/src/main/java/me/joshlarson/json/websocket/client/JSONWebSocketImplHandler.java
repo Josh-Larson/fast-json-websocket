@@ -2,7 +2,7 @@ package me.joshlarson.json.websocket.client;
 
 import java.nio.ByteBuffer;
 
-public interface JSONWebSocketImplHandler {
+interface JSONWebSocketImplHandler {
 	
 	void onConnect();
 	void onDisconnect();
