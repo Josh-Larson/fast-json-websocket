@@ -1,4 +1,4 @@
-package me.joshlarson.json.websocket;
+package me.joshlarson.json.websocket.client;
 
 import java.nio.ByteBuffer;
 

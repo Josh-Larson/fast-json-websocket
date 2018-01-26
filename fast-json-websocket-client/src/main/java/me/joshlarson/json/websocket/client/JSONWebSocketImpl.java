@@ -1,4 +1,4 @@
-package me.joshlarson.json.websocket;
+package me.joshlarson.json.websocket.client;
 
 import javax.websocket.*;
 import javax.websocket.CloseReason.CloseCode;

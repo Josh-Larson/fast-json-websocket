@@ -1,4 +1,4 @@
-package me.joshlarson.json.websocket;
+package me.joshlarson.json.websocket.client;
 
 import me.joshlarson.json.JSONException;
 import me.joshlarson.json.JSONInputStream;

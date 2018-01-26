@@ -2,6 +2,8 @@ package me.joshlarson.json.websocket;
 
 import me.joshlarson.json.JSONException;
 import me.joshlarson.json.JSONObject;
+import me.joshlarson.json.websocket.client.JSONWebSocketClient;
+import me.joshlarson.json.websocket.client.JSONWebSocketHandler;
 import me.joshlarson.json.websocket.server.JSONWebSocketConnection;
 import me.joshlarson.json.websocket.server.JSONWebSocketConnectionHandler;
 import me.joshlarson.json.websocket.server.JSONWebSocketServer;

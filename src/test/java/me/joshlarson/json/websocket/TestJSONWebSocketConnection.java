@@ -1,5 +1,6 @@
 package me.joshlarson.json.websocket;
 
+import me.joshlarson.json.websocket.client.JSONWebSocketClient;
 import me.joshlarson.json.websocket.server.JSONWebSocketServer;
 import org.junit.Test;
 import org.junit.runner.RunWith;
