@@ -30,6 +30,7 @@ dependencies {
 jar {
 	baseName = "fast-json-websocket-client"
 	classifier = null
+	version = pluginVersion
 	from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
 }
 
