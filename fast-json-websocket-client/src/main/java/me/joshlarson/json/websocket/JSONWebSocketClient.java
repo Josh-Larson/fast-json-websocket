@@ -5,6 +5,7 @@ import me.joshlarson.json.JSONInputStream;
 import me.joshlarson.json.JSONObject;
 
 import java.io.IOException;
+import java.net.SocketException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
@@ -32,6 +33,14 @@ public class JSONWebSocketClient {
 				JSONWebSocketClient.this.onError(t);
 			}
 		});
+	}
+	
+	public boolean isConnected() {
+		return impl.isConnected();
+	}
+	
+	public boolean isSecure() {
+		return impl.isSecure();
 	}
 	
 	public void connect(String uri) throws URISyntaxException, IOException {

@@ -1,5 +1,6 @@
 package me.joshlarson.json.websocket.server;
 
+import me.joshlarson.json.JSONObject;
 import org.nanohttpd.protocols.websockets.CloseCode;
 
 import java.io.IOException;
@@ -13,6 +14,10 @@ public class JSONWebSocketConnection {
 	JSONWebSocketConnection(JSONWebSocketConnectionImpl impl) {
 		this.impl = impl;
 		this.random = new Random();
+	}
+	
+	public boolean isConnected() {
+		return impl.isConnected();
 	}
 	
 	public void close() throws IOException {
@@ -33,12 +38,8 @@ public class JSONWebSocketConnection {
 		impl.ping(payload);
 	}
 	
-	public void send(byte[] payload) throws IOException {
-		impl.send(payload);
-	}
-	
-	public void send(String payload) throws IOException {
-		impl.send(payload);
+	public void send(JSONObject object) throws IOException {
+		impl.send(object.toString(true));
 	}
 	
 }

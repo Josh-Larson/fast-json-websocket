@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.nio.ByteBuffer;
 import java.util.Random;
+import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicReference;
 
 @ClientEndpoint
@@ -20,6 +21,16 @@ public class JSONWebSocketImpl {
 		this.session = new AtomicReference<>(null);
 		this.random = new Random();
 		this.connectionMutex = new Object();
+	}
+	
+	public boolean isConnected() {
+		Session session = this.session.get();
+		return session != null && session.isOpen();
+	}
+	
+	public boolean isSecure() {
+		Session session = this.session.get();
+		return session != null && session.isSecure();
 	}
 	
 	public void connect(URI endpoint) throws IOException {
@@ -66,8 +77,13 @@ public class JSONWebSocketImpl {
 	
 	public void sendMessage(String message) {
 		Session session = this.session.get();
-		if (session != null)
-			session.getAsyncRemote().sendText(message);
+		if (session == null)
+			return;
+		try {
+			session.getBasicRemote().sendText(message);
+		} catch (Throwable t) {
+			onError(t);
+		}
 	}
 	
 	public void ping() throws IOException {

@@ -9,21 +9,31 @@ import org.nanohttpd.protocols.websockets.WebSocket;
 import org.nanohttpd.protocols.websockets.WebSocketFrame;
 
 import java.io.IOException;
+import java.net.SocketException;
+import java.util.Locale;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 class JSONWebSocketConnectionImpl extends WebSocket {
 	
 	private final AtomicReference<JSONWebSocketConnectionHandler> handler;
 	private final JSONWebSocketConnection socket;
+	private final AtomicBoolean connected;
 	
 	public JSONWebSocketConnectionImpl(IHTTPSession handshakeRequest, AtomicReference<JSONWebSocketConnectionHandler> handler) {
 		super(handshakeRequest);
 		this.handler = handler;
 		this.socket = new JSONWebSocketConnection(this);
+		this.connected = new AtomicBoolean(false);
+	}
+	
+	public boolean isConnected() {
+		return connected.get();
 	}
 	
 	@Override
 	protected void onOpen() {
+		connected.set(true);
 		JSONWebSocketConnectionHandler handler = this.handler.get();
 		if (handler != null)
 			handler.onConnect(socket);
@@ -31,6 +41,7 @@ class JSONWebSocketConnectionImpl extends WebSocket {
 	
 	@Override
 	protected void onClose(CloseCode closeCode, String s, boolean b) {
+		connected.set(false);
 		JSONWebSocketConnectionHandler handler = this.handler.get();
 		if (handler != null)
 			handler.onDisconnect(socket);
@@ -58,6 +69,8 @@ class JSONWebSocketConnectionImpl extends WebSocket {
 	
 	@Override
 	protected void onException(IOException e) {
+		if (e instanceof SocketException && e.getMessage() != null && e.getMessage().toLowerCase(Locale.US).contains("socket closed"))
+			return;
 		JSONWebSocketConnectionHandler handler = this.handler.get();
 		if (handler != null)
 			handler.onError(socket, e);
