@@ -4,21 +4,25 @@ import me.joshlarson.json.JSONObject;
 
 import java.nio.ByteBuffer;
 
-public interface JSONWebSocketConnectionHandler {
+public abstract class JSONWebSocketConnectionHandler {
 	
 	/**
 	 * Called when the socket is officially connected
 	 *
 	 * @param socket the socket that was connected
 	 */
-	void onConnect(JSONWebSocketConnection socket);
+	public void onConnect(JSONWebSocketConnection socket) {
+		
+	}
 	
 	/**
 	 * Called when the socket is officially disconnected
 	 *
 	 * @param socket the socket that was disconnected
 	 */
-	void onDisconnect(JSONWebSocketConnection socket);
+	public void onDisconnect(JSONWebSocketConnection socket) {
+		
+	}
 	
 	/**
 	 * Called when a new message has arrived
@@ -26,7 +30,9 @@ public interface JSONWebSocketConnectionHandler {
 	 * @param socket the socket that the message arrived from
 	 * @param object the JSONObject received
 	 */
-	void onMessage(JSONWebSocketConnection socket, JSONObject object);
+	public void onMessage(JSONWebSocketConnection socket, JSONObject object) {
+		
+	}
 	
 	/**
 	 * Called when the client replies to a server ping
@@ -34,7 +40,19 @@ public interface JSONWebSocketConnectionHandler {
 	 * @param socket the socket that was pinged
 	 * @param data   the data from the pong
 	 */
-	void onPong(JSONWebSocketConnection socket, ByteBuffer data);
+	public void onPong(JSONWebSocketConnection socket, ByteBuffer data) {
+		
+	}
+	
+	/**
+	 * Called when the client replies to a timed server ping.  This is called after onPong.
+	 *
+	 * @param socket  the socket that was pinged
+	 * @param rttNano the round trip time in nanoseconds
+	 */
+	public void onPongTimed(JSONWebSocketConnection socket, long rttNano) {
+		
+	}
 	
 	/**
 	 * Called when there is an internal error within the socket.  Could be an IOException from the network, or a JSONException when trying to decode a
@@ -43,6 +61,8 @@ public interface JSONWebSocketConnectionHandler {
 	 * @param socket the socket that the error occured on
 	 * @param t      the throwable thrown
 	 */
-	void onError(JSONWebSocketConnection socket, Throwable t);
+	public void onError(JSONWebSocketConnection socket, Throwable t) {
+		
+	}
 	
 }

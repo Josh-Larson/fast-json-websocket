@@ -8,6 +8,7 @@ interface JSONWebSocketImplHandler {
 	void onDisconnect();
 	void onMessage(String message);
 	void onPong(ByteBuffer data);
+	void onPongTimed(long rttNano);
 	void onError(Throwable t);
 	
 }

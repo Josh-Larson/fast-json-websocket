@@ -1,9 +1,6 @@
 package me.joshlarson.json.websocket;
 
-import me.joshlarson.json.JSONObject;
 import me.joshlarson.json.websocket.client.JSONWebSocketClient;
-import me.joshlarson.json.websocket.server.JSONWebSocketConnection;
-import me.joshlarson.json.websocket.server.JSONWebSocketConnectionHandler;
 import me.joshlarson.json.websocket.server.JSONWebSocketServer;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -13,7 +10,6 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.URISyntaxException;
-import java.nio.ByteBuffer;
 
 @RunWith(JUnit4.class)
 public class TestJSONWebSocketConnection {

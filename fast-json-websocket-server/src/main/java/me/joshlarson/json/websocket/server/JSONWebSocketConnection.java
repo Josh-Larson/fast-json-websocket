@@ -1,11 +1,10 @@
 package me.joshlarson.json.websocket.server;
 
 import me.joshlarson.json.JSONObject;
+import org.nanohttpd.protocols.http.IHTTPSession;
 import org.nanohttpd.protocols.websockets.CloseCode;
 
 import java.io.IOException;
-import java.net.InetAddress;
-import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -14,13 +13,11 @@ public class JSONWebSocketConnection {
 	private static final AtomicLong GLOBAL_SOCKET_ID = new AtomicLong(0);
 	
 	private final JSONWebSocketConnectionImpl impl;
-	private final Random random;
 	private final AtomicReference<Object> userData;
 	private final long socketId;
 	
 	JSONWebSocketConnection(JSONWebSocketConnectionImpl impl) {
 		this.impl = impl;
-		this.random = new Random();
 		this.userData = new AtomicReference<>(null);
 		this.socketId = GLOBAL_SOCKET_ID.incrementAndGet();
 	}
@@ -32,6 +29,15 @@ public class JSONWebSocketConnection {
 	 */
 	public String getRemoteIpAddress() {
 		return impl.getHandshakeRequest().getRemoteIpAddress();
+	}
+	
+	/**
+	 * Gets the handshake request that started the connection
+	 * 
+	 * @return the handshake request
+	 */
+	public IHTTPSession getHandshakeRequest() {
+		return impl.getHandshakeRequest();
 	}
 	
 	/**
@@ -95,10 +101,17 @@ public class JSONWebSocketConnection {
 	 *
 	 * @throws IOException if an I/O error occurs
 	 */
-	public void ping() throws IOException {
-		byte[] pingBytes = new byte[4];
-		random.nextBytes(pingBytes);
-		ping(pingBytes);
+	public void pingRandom() throws IOException {
+		impl.pingRandom();
+	}
+	
+	/**
+	 * Sends a ping with data that allows the server to determine the round-trip time
+	 * 
+	 * @throws IOException if an I/O error occurs
+	 */
+	public void pingTimed() throws IOException {
+		impl.pingTimed();
 	}
 	
 	/**
