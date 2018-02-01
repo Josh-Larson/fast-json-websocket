@@ -1,3 +1,7 @@
+## Credit:
+
+This library uses both NanoHTTPD and nv-websocket-client to implement the JSON interface
+
 ## How to get it:
 
 #### Client:
