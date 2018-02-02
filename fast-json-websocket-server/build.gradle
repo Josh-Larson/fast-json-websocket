@@ -1,5 +1,6 @@
 plugins {
 	id 'java'
+	id 'findbugs'
 	id "com.jfrog.bintray" version "1.8.0"
 	id 'maven'
 	id 'maven-publish'
@@ -10,7 +11,7 @@ targetCompatibility = 1.7
 
 def pluginGroup = "me.joshlarson"
 def pluginName = "fast-json-websocket-server"
-def pluginVersion = "1.4.1"
+def pluginVersion = "1.4.2"
 
 group = pluginGroup
 version = pluginVersion
@@ -20,6 +21,7 @@ repositories {
 }
 
 dependencies {
+	compile group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.2'
 	compile group: "me.joshlarson", name: "fast-json", version: "2.2.3"
 	compile files("libs/nanohttpd-core-2.3.2.jar")
 	compile files("libs/nanohttpd-websocket-2.3.2.jar")
@@ -114,5 +116,12 @@ bintray {
 			released = new Date()
 			vcsTag = 'v' + pluginVersion
 		}
+	}
+}
+
+tasks.withType(FindBugs) {
+	reports {
+		xml.enabled = false
+		html.enabled = true
 	}
 }

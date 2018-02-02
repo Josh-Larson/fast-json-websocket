@@ -2,6 +2,7 @@ package me.joshlarson.json.websocket.client;
 
 import me.joshlarson.json.JSONObject;
 
+import javax.annotation.Nonnull;
 import java.nio.ByteBuffer;
 
 public abstract class JSONWebSocketHandler {
@@ -11,7 +12,7 @@ public abstract class JSONWebSocketHandler {
 	 *
 	 * @param socket the socket that was connected
 	 */
-	public void onConnect(JSONWebSocketClient socket) {
+	public void onConnect(@Nonnull JSONWebSocketClient socket) {
 		
 	}
 	
@@ -20,7 +21,7 @@ public abstract class JSONWebSocketHandler {
 	 *
 	 * @param socket the socket that was disconnected
 	 */
-	public void onDisconnect(JSONWebSocketClient socket) {
+	public void onDisconnect(@Nonnull JSONWebSocketClient socket) {
 		
 	}
 	
@@ -30,7 +31,9 @@ public abstract class JSONWebSocketHandler {
 	 * @param socket the socket that the message arrived from
 	 * @param object the JSONObject received
 	 */
-	public abstract void onMessage(JSONWebSocketClient socket, JSONObject object);
+	public void onMessage(@Nonnull JSONWebSocketClient socket, @Nonnull JSONObject object) {
+		
+	}
 	
 	/**
 	 * Called when the server replies to a client ping
@@ -38,7 +41,7 @@ public abstract class JSONWebSocketHandler {
 	 * @param socket the socket that pinged
 	 * @param data   the data from the pong
 	 */
-	public void onPong(JSONWebSocketClient socket, ByteBuffer data) {
+	public void onPong(@Nonnull JSONWebSocketClient socket, @Nonnull ByteBuffer data) {
 		
 	}
 	
@@ -48,7 +51,7 @@ public abstract class JSONWebSocketHandler {
 	 * @param socket  the socket that was pinged
 	 * @param rttNano the round trip time in nanoseconds
 	 */
-	public void onPongTimed(JSONWebSocketClient socket, long rttNano) {
+	public void onPongTimed(@Nonnull JSONWebSocketClient socket, long rttNano) {
 		
 	}
 	
@@ -59,7 +62,7 @@ public abstract class JSONWebSocketHandler {
 	 * @param socket the socket that the error occured on
 	 * @param t      the throwable thrown
 	 */
-	public void onError(JSONWebSocketClient socket, Throwable t) {
+	public void onError(@Nonnull JSONWebSocketClient socket, @Nonnull Throwable t) {
 		t.printStackTrace();
 	}
 	

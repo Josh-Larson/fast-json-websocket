@@ -10,6 +10,7 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 
+import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.HashSet;
@@ -116,7 +117,7 @@ public class TestJSONWebSocket {
 	
 	protected class DefaultServerHandler extends JSONWebSocketConnectionHandler {
 		
-		public void onConnect(JSONWebSocketConnection socket) {
+		public void onConnect(@Nonnull JSONWebSocketConnection socket) {
 			connected.set(true);
 			if (!sessionIds.add(socket.getSocketId()))
 				failed.set(true);
@@ -124,38 +125,38 @@ public class TestJSONWebSocket {
 				failed.set(true);
 		}
 		
-		public void onDisconnect(JSONWebSocketConnection socket) { disconnected.set(true); }
+		public void onDisconnect(@Nonnull JSONWebSocketConnection socket) { disconnected.set(true); }
 		
-		public void onMessage(JSONWebSocketConnection socket, JSONObject object) { serverMessageHandler.onMessage(socket, object); }
+		public void onMessage(@Nonnull JSONWebSocketConnection socket, @Nonnull JSONObject object) { serverMessageHandler.onMessage(socket, object); }
 		
-		public void onPong(JSONWebSocketConnection socket, ByteBuffer data) { serverPongCount.incrementAndGet(); }
+		public void onPong(@Nonnull JSONWebSocketConnection socket, @Nonnull ByteBuffer data) { serverPongCount.incrementAndGet(); }
 		
-		public void onError(JSONWebSocketConnection socket, Throwable t) { serverErrorHandler.onError(t); }
+		public void onError(@Nonnull JSONWebSocketConnection socket, @Nonnull Throwable t) { serverErrorHandler.onError(t); }
 	}
 	
 	protected class DefaultClientHandler extends JSONWebSocketHandler {
 		
-		public void onConnect(JSONWebSocketClient socket) {
+		public void onConnect(@Nonnull JSONWebSocketClient socket) {
 			
 		}
 		
-		public void onDisconnect(JSONWebSocketClient socket) {
+		public void onDisconnect(@Nonnull JSONWebSocketClient socket) {
 			
 		}
 		
-		public void onMessage(JSONWebSocketClient socket, JSONObject object) {
+		public void onMessage(@Nonnull JSONWebSocketClient socket, @Nonnull JSONObject object) {
 			clientMessageHandler.onMessage(socket, object);
 		}
 		
-		public void onPong(JSONWebSocketClient socket, ByteBuffer data) {
+		public void onPong(@Nonnull JSONWebSocketClient socket, @Nonnull ByteBuffer data) {
 			clientPongCount.incrementAndGet();
 		}
 		
-		public void onPongTimed(JSONWebSocketClient socket, long rttNano) {
+		public void onPongTimed(@Nonnull JSONWebSocketClient socket, long rttNano) {
 			
 		}
 		
-		public void onError(JSONWebSocketClient socket, Throwable t) {
+		public void onError(@Nonnull JSONWebSocketClient socket, @Nonnull Throwable t) {
 			clientErrorHandler.onError(t);
 		}
 	}

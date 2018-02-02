@@ -8,6 +8,8 @@ import org.nanohttpd.protocols.websockets.CloseCode;
 import org.nanohttpd.protocols.websockets.WebSocket;
 import org.nanohttpd.protocols.websockets.WebSocketFrame;
 
+import javax.annotation.Nonnull;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.SocketException;
 import java.nio.ByteBuffer;
@@ -25,7 +27,7 @@ class JSONWebSocketConnectionImpl extends WebSocket {
 	private final long pingId;
 	private final AtomicBoolean connected;
 	
-	JSONWebSocketConnectionImpl(IHTTPSession handshakeRequest, AtomicReference<JSONWebSocketConnectionHandler> handler) {
+	JSONWebSocketConnectionImpl(@Nonnull IHTTPSession handshakeRequest, @Nonnull AtomicReference<JSONWebSocketConnectionHandler> handler) {
 		super(handshakeRequest);
 		this.handler = handler;
 		this.socket = new JSONWebSocketConnection(this);
@@ -80,12 +82,12 @@ class JSONWebSocketConnectionImpl extends WebSocket {
 	}
 	
 	@Override
-	protected void onMessage(WebSocketFrame webSocketFrame) {
+	protected void onMessage(@Nonnull WebSocketFrame webSocketFrame) {
 		JSONWebSocketConnectionHandler handler = this.handler.get();
 		if (handler == null)
 			return;
 		
-		try (JSONInputStream in = new JSONInputStream(webSocketFrame.getTextPayload())) {
+		try (JSONInputStream in = new JSONInputStream(new ByteArrayInputStream(webSocketFrame.getBinaryPayload()))) {
 			JSONObject object = in.readObject();
 			if (object == null)
 				throw new JSONException("Invalid JSON: empty string");
@@ -106,7 +108,7 @@ class JSONWebSocketConnectionImpl extends WebSocket {
 	}
 	
 	@Override
-	protected void onPong(WebSocketFrame webSocketFrame) {
+	protected void onPong(@Nonnull WebSocketFrame webSocketFrame) {
 		JSONWebSocketConnectionHandler handler = this.handler.get();
 		if (handler != null) {
 			byte [] payload = webSocketFrame.getBinaryPayload();
@@ -131,7 +133,7 @@ class JSONWebSocketConnectionImpl extends WebSocket {
 	}
 	
 	@Override
-	protected void onException(IOException e) {
+	protected void onException(@Nonnull IOException e) {
 		if (e instanceof SocketException && e.getMessage() != null && e.getMessage().toLowerCase(Locale.US).contains("socket closed"))
 			return;
 		JSONWebSocketConnectionHandler handler = this.handler.get();

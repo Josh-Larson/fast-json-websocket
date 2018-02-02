@@ -10,11 +10,11 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.nanohttpd.protocols.http.NanoHTTPD;
 
-import javax.net.ssl.*;
-import java.io.File;
-import java.io.FileInputStream;
+import javax.annotation.Nonnull;
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManagerFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
@@ -37,10 +37,10 @@ public class TestJSONWebSocketSecure {
 		final AtomicBoolean completed = new AtomicBoolean(false);
 		final AtomicBoolean failed = new AtomicBoolean(false);
 		server.setHandler(new JSONWebSocketConnectionHandler() {
-			public void onDisconnect(JSONWebSocketConnection socket) {
+			public void onDisconnect(@Nonnull JSONWebSocketConnection socket) {
 				disconnected.set(true);
 			}
-			public void onMessage(JSONWebSocketConnection socket, JSONObject object) {
+			public void onMessage(@Nonnull JSONWebSocketConnection socket, @Nonnull JSONObject object) {
 				try {
 					socket.send(object);
 				} catch (IOException e) {
@@ -51,7 +51,7 @@ public class TestJSONWebSocketSecure {
 			}
 		});
 		client.setHandler(new JSONWebSocketHandler() {
-			public void onMessage(JSONWebSocketClient socket, JSONObject object) {
+			public void onMessage(@Nonnull JSONWebSocketClient socket, @Nonnull JSONObject object) {
 				completed.set(true);
 			}
 		});

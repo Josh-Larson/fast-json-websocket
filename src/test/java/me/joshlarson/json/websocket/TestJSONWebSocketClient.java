@@ -2,7 +2,6 @@ package me.joshlarson.json.websocket;
 
 import me.joshlarson.json.JSONException;
 import me.joshlarson.json.JSONObject;
-import me.joshlarson.json.websocket.client.CloseCode;
 import me.joshlarson.json.websocket.client.JSONWebSocketClient;
 import me.joshlarson.json.websocket.server.JSONWebSocketConnection;
 import org.junit.Assert;
@@ -10,6 +9,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
+import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -77,7 +77,7 @@ public class TestJSONWebSocketClient extends TestJSONWebSocket {
 		final AtomicLong startTime = new AtomicLong(-1);
 		client.setHandler(new DefaultClientHandler() {
 			@Override
-			public void onPongTimed(JSONWebSocketClient socket, long rttNano) {
+			public void onPongTimed(@Nonnull JSONWebSocketClient socket, long rttNano) {
 				long rx = System.nanoTime();
 				validPong.set(Math.abs((rx - startTime.get()) - rttNano) <= 1E6); // within 1ms of measured
 				receivedPong.set(true);

@@ -1,8 +1,8 @@
 package me.joshlarson.json.websocket.client;
 
 import com.neovisionaries.ws.client.*;
-import com.sun.istack.internal.NotNull;
 
+import javax.annotation.Nonnull;
 import javax.net.SocketFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
@@ -22,16 +22,16 @@ class JSONWebSocketImpl extends WebSocketAdapter {
 	private final JSONWebSocketImplHandler messageHandler;
 	private final WebSocketSettings socketSettings;
 	private final WebSocketFactory webSocketFactory;
+	private final Random random;
 	private final long pingId;
 	
-	JSONWebSocketImpl(JSONWebSocketImplHandler handler) {
-		if (handler == null)
-			throw new NullPointerException("Handler cannot be null");
+	JSONWebSocketImpl(@Nonnull JSONWebSocketImplHandler handler) {
 		this.socket = new AtomicReference<>(null);
 		this.messageHandler = handler;
 		this.socketSettings = new WebSocketSettings();
 		this.webSocketFactory = new WebSocketFactory();
-		this.pingId = new Random().nextLong();
+		this.random = new Random();
+		this.pingId = random.nextLong();
 	}
 	
 	public boolean isConnected() {
@@ -39,43 +39,55 @@ class JSONWebSocketImpl extends WebSocketAdapter {
 		return socket != null && socket.isOpen();
 	}
 	
-	public void setProxy(URI proxyUri) {
+	public void setProxy(@Nonnull URI proxyUri) {
+		Objects.requireNonNull(proxyUri, "proxyUri");
 		webSocketFactory.getProxySettings().setServer(proxyUri);
 	}
 	
-	public void setProxy(URL proxyUrl) {
+	public void setProxy(@Nonnull URL proxyUrl) {
+		Objects.requireNonNull(proxyUrl, "proxyUrl");
 		webSocketFactory.getProxySettings().setServer(proxyUrl);
 	}
 	
-	public void setProxy(String uri) {
+	public void setProxy(@Nonnull String uri) {
+		Objects.requireNonNull(uri, "uri");
 		webSocketFactory.getProxySettings().setServer(uri);
 	}
 	
-	public void setProxy(boolean secure, String user, String pass, String host, int port) {
+	public void setProxy(boolean secure, @Nonnull String user, @Nonnull String pass, @Nonnull String host, int port) {
+		Objects.requireNonNull(user, "user");
+		Objects.requireNonNull(pass, "pass");
+		Objects.requireNonNull(host, "host");
 		webSocketFactory.getProxySettings().setSecure(secure).setId(user).setPassword(pass).setHost(host).setPort(port);
 	}
 	
-	public void setProxySocketFactory(SocketFactory factory) {
+	public void setProxySocketFactory(@Nonnull SocketFactory factory) {
+		Objects.requireNonNull(factory, "factory");
 		webSocketFactory.getProxySettings().setSocketFactory(factory);
 	}
 	
-	public void setProxySSLSocketFactory(SSLSocketFactory factory) {
+	public void setProxySSLSocketFactory(@Nonnull SSLSocketFactory factory) {
+		Objects.requireNonNull(factory, "factory");
 		webSocketFactory.getProxySettings().setSSLSocketFactory(factory);
 	}
 	
-	public void setProxySSLContext(SSLContext context) {
+	public void setProxySSLContext(@Nonnull SSLContext context) {
+		Objects.requireNonNull(context, "context");
 		webSocketFactory.getProxySettings().setSSLContext(context);
 	}
 	
-	public void setSocketFactory(SocketFactory factory) {
+	public void setSocketFactory(@Nonnull SocketFactory factory) {
+		Objects.requireNonNull(factory, "factory");
 		webSocketFactory.setSocketFactory(factory);
 	}
 	
-	public void setSSLSocketFactory(SSLSocketFactory factory) {
+	public void setSSLSocketFactory(@Nonnull SSLSocketFactory factory) {
+		Objects.requireNonNull(factory, "factory");
 		webSocketFactory.setSSLSocketFactory(factory);
 	}
 	
-	public void setSSLContext(SSLContext context) {
+	public void setSSLContext(@Nonnull SSLContext context) {
+		Objects.requireNonNull(context, "context");
 		webSocketFactory.setSSLContext(context);
 	}
 	
@@ -91,11 +103,11 @@ class JSONWebSocketImpl extends WebSocketAdapter {
 		socketSettings.clearProtocols();
 	}
 	
-	public void addProtocol(String protocol) {
+	public void addProtocol(@Nonnull String protocol) {
 		socketSettings.addProtocol(protocol);
 	}
 	
-	public void removeProtocol(String protocol) {
+	public void removeProtocol(@Nonnull String protocol) {
 		socketSettings.removeProtocol(protocol);
 	}
 	
@@ -103,11 +115,11 @@ class JSONWebSocketImpl extends WebSocketAdapter {
 		socketSettings.clearHeaders();
 	}
 	
-	public void addHeader(String key, String value) {
+	public void addHeader(@Nonnull String key, @Nonnull String value) {
 		socketSettings.addHeader(key, value);
 	}
 	
-	public void removeHeader(String key) {
+	public void removeHeader(@Nonnull String key) {
 		socketSettings.removeHeader(key);
 	}
 	
@@ -115,7 +127,7 @@ class JSONWebSocketImpl extends WebSocketAdapter {
 		socketSettings.clearUserInfo();
 	}
 	
-	public void setUserInfo(String username, String password) {
+	public void setUserInfo(@Nonnull String username, @Nonnull String password) {
 		socketSettings.setUserInfo(username, password);
 	}
 	
@@ -127,7 +139,8 @@ class JSONWebSocketImpl extends WebSocketAdapter {
 		socketSettings.setMaxPayloadSize(size);
 	}
 	
-	public void connect(URI endpoint) throws IOException {
+	public void connect(@Nonnull URI endpoint) throws IOException {
+		Objects.requireNonNull(endpoint, "endpoint");
 		synchronized (webSocketFactory) {
 			try {
 				WebSocket socket = webSocketFactory.createSocket(endpoint);
@@ -146,12 +159,16 @@ class JSONWebSocketImpl extends WebSocketAdapter {
 		this.socket.set(null);
 	}
 	
-	public void disconnect(CloseCode code, String reason) {
+	public void disconnect(@Nonnull CloseCode code, @Nonnull String reason) {
+		Objects.requireNonNull(code, "code");
+		Objects.requireNonNull(reason, "reason");
 		getSocket().disconnect(code.getCode(), reason);
 		this.socket.set(null);
 	}
 	
-	public void disconnect(CloseCode code, String reason, long closeTimeout) {
+	public void disconnect(@Nonnull CloseCode code, @Nonnull String reason, long closeTimeout) {
+		Objects.requireNonNull(code, "code");
+		Objects.requireNonNull(reason, "reason");
 		getSocket().disconnect(code.getCode(), reason, closeTimeout);
 		this.socket.set(null);
 	}
@@ -214,7 +231,8 @@ class JSONWebSocketImpl extends WebSocketAdapter {
 		onError(cause);
 	}
 	
-	public boolean send(String message) {
+	public boolean send(@Nonnull String message) {
+		Objects.requireNonNull(message, "message");
 		WebSocket socket = getSocket();
 		try {
 			socket.sendText(message);
@@ -236,15 +254,17 @@ class JSONWebSocketImpl extends WebSocketAdapter {
 	
 	public void ping() {
 		byte[] pingData = new byte[4];
-		new Random().nextBytes(pingData);
+		random.nextBytes(pingData);
 		ping(pingData);
 	}
 	
-	public void ping(byte[] data) {
+	public void ping(@Nonnull byte[] data) {
+		Objects.requireNonNull(data, "data");
 		getSocket().sendPing(data);
 	}
 	
-	public void ping(ByteBuffer data) {
+	public void ping(@Nonnull ByteBuffer data) {
+		Objects.requireNonNull(data, "data");
 		getSocket().sendPing(data.array());
 	}
 	
@@ -255,7 +275,7 @@ class JSONWebSocketImpl extends WebSocketAdapter {
 		ping(data.array());
 	}
 	
-	private void onError(Throwable t) {
+	private void onError(@Nonnull Throwable t) {
 		try {
 			getHandler().onError(t);
 		} catch (Throwable user) {
@@ -264,10 +284,12 @@ class JSONWebSocketImpl extends WebSocketAdapter {
 		}
 	}
 	
+	@Nonnull
 	private JSONWebSocketImplHandler getHandler() {
 		return messageHandler;
 	}
 	
+	@Nonnull
 	private WebSocket getSocket() {
 		WebSocket socket = this.socket.get();
 		if (socket != null)
@@ -306,11 +328,13 @@ class JSONWebSocketImpl extends WebSocketAdapter {
 			protocols.clear();
 		}
 		
-		public void addProtocol(String protocol) {
+		public void addProtocol(@Nonnull String protocol) {
+			Objects.requireNonNull(protocol, "protocol");
 			this.protocols.add(protocol);
 		}
 		
-		public void removeProtocol(String protocol) {
+		public void removeProtocol(@Nonnull String protocol) {
+			Objects.requireNonNull(protocol, "protocol");
 			this.protocols.remove(protocol);
 		}
 		
@@ -318,11 +342,14 @@ class JSONWebSocketImpl extends WebSocketAdapter {
 			headers.clear();
 		}
 		
-		public void addHeader(String key, String value) {
+		public void addHeader(@Nonnull String key, @Nonnull String value) {
+			Objects.requireNonNull(key, "key");
+			Objects.requireNonNull(value, "value");
 			headers.put(key, value);
 		}
 		
-		public void removeHeader(String key) {
+		public void removeHeader(@Nonnull String key) {
+			Objects.requireNonNull(key, "key");
 			headers.remove(key);
 		}
 		
@@ -331,7 +358,9 @@ class JSONWebSocketImpl extends WebSocketAdapter {
 			userInfo.setValue(null);
 		}
 		
-		public void setUserInfo(String username, String password) {
+		public void setUserInfo(@Nonnull String username, @Nonnull String password) {
+			Objects.requireNonNull(username, "username");
+			Objects.requireNonNull(password, "password");
 			userInfo.setKey(username);
 			userInfo.setValue(password);
 		}
@@ -344,7 +373,8 @@ class JSONWebSocketImpl extends WebSocketAdapter {
 			maxPayloadSize.set(size);
 		}
 		
-		public void apply(@NotNull WebSocket socket) {
+		public void apply(@Nonnull WebSocket socket) {
+			Objects.requireNonNull(socket, "socket");
 			for (String str : protocols)
 				socket.addProtocol(str);
 			for (Entry<String, String> e : headers.entrySet())

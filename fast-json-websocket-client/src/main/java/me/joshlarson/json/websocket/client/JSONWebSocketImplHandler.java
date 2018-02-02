@@ -1,14 +1,15 @@
 package me.joshlarson.json.websocket.client;
 
+import javax.annotation.Nonnull;
 import java.nio.ByteBuffer;
 
 interface JSONWebSocketImplHandler {
 	
 	void onConnect();
 	void onDisconnect();
-	void onMessage(String message);
-	void onPong(ByteBuffer data);
+	void onMessage(@Nonnull String message);
+	void onPong(@Nonnull ByteBuffer data);
 	void onPongTimed(long rttNano);
-	void onError(Throwable t);
+	void onError(@Nonnull Throwable t);
 	
 }

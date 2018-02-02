@@ -4,6 +4,8 @@ import me.joshlarson.json.JSONException;
 import me.joshlarson.json.JSONInputStream;
 import me.joshlarson.json.JSONObject;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.net.SocketFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
@@ -12,6 +14,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.ByteBuffer;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class JSONWebSocketClient {
@@ -30,11 +33,11 @@ public class JSONWebSocketClient {
 				JSONWebSocketClient.this.onDisconnect();
 			}
 			
-			public void onMessage(String message) {
+			public void onMessage(@Nonnull String message) {
 				JSONWebSocketClient.this.onMessage(message);
 			}
 			
-			public void onPong(ByteBuffer data) {
+			public void onPong(@Nonnull ByteBuffer data) {
 				JSONWebSocketClient.this.onPong(data);
 			}
 			
@@ -42,7 +45,7 @@ public class JSONWebSocketClient {
 				JSONWebSocketClient.this.onPongTimed(rttNano);
 			}
 			
-			public void onError(Throwable t) {
+			public void onError(@Nonnull Throwable t) {
 				JSONWebSocketClient.this.onError(t);
 			}
 		});
@@ -55,7 +58,7 @@ public class JSONWebSocketClient {
 	 *
 	 * @param proxyUri the URI of the proxy server
 	 */
-	public void setProxy(URI proxyUri) {
+	public void setProxy(@Nonnull URI proxyUri) {
 		impl.setProxy(proxyUri);
 	}
 	
@@ -65,7 +68,7 @@ public class JSONWebSocketClient {
 	 *
 	 * @param proxyUrl the URL of the proxy server
 	 */
-	public void setProxy(URL proxyUrl) {
+	public void setProxy(@Nonnull URL proxyUrl) {
 		impl.setProxy(proxyUrl);
 	}
 	
@@ -75,7 +78,7 @@ public class JSONWebSocketClient {
 	 *
 	 * @param uri the URI of the proxy server
 	 */
-	public void setProxy(String uri) {
+	public void setProxy(@Nonnull String uri) {
 		impl.setProxy(uri);
 	}
 	
@@ -89,7 +92,7 @@ public class JSONWebSocketClient {
 	 * @param host   the proxy server host
 	 * @param port   the proxy server port
 	 */
-	public void setProxy(boolean secure, String user, String pass, String host, int port) {
+	public void setProxy(boolean secure, @Nonnull String user, @Nonnull String pass, @Nonnull String host, int port) {
 		impl.setProxy(secure, user, pass, host, port);
 	}
 	
@@ -98,7 +101,7 @@ public class JSONWebSocketClient {
 	 *
 	 * @param factory the SocketFactory
 	 */
-	public void setProxySocketFactory(SocketFactory factory) {
+	public void setProxySocketFactory(@Nonnull SocketFactory factory) {
 		impl.setProxySocketFactory(factory);
 	}
 	
@@ -107,7 +110,7 @@ public class JSONWebSocketClient {
 	 *
 	 * @param factory the SSLSocketFactory
 	 */
-	public void setProxySSLSocketFactory(SSLSocketFactory factory) {
+	public void setProxySSLSocketFactory(@Nonnull SSLSocketFactory factory) {
 		impl.setProxySSLSocketFactory(factory);
 	}
 	
@@ -116,7 +119,7 @@ public class JSONWebSocketClient {
 	 *
 	 * @param context the SSLContext
 	 */
-	public void setProxySSLContext(SSLContext context) {
+	public void setProxySSLContext(@Nonnull SSLContext context) {
 		impl.setProxySSLContext(context);
 	}
 	
@@ -125,7 +128,7 @@ public class JSONWebSocketClient {
 	 *
 	 * @param factory the SocketFactory
 	 */
-	public void setSocketFactory(SocketFactory factory) {
+	public void setSocketFactory(@Nonnull SocketFactory factory) {
 		impl.setSocketFactory(factory);
 	}
 	
@@ -134,7 +137,7 @@ public class JSONWebSocketClient {
 	 *
 	 * @param factory the SSLSocketFactory
 	 */
-	public void setSSLSocketFactory(SSLSocketFactory factory) {
+	public void setSSLSocketFactory(@Nonnull SSLSocketFactory factory) {
 		impl.setSSLSocketFactory(factory);
 	}
 	
@@ -143,7 +146,7 @@ public class JSONWebSocketClient {
 	 *
 	 * @param context the SSLContext
 	 */
-	public void setSSLContext(SSLContext context) {
+	public void setSSLContext(@Nonnull SSLContext context) {
 		impl.setSSLContext(context);
 	}
 	
@@ -183,7 +186,7 @@ public class JSONWebSocketClient {
      *
 	 * @see com.neovisionaries.ws.client.WebSocket#addProtocol
      */
-	public void addProtocol(String protocol) {
+	public void addProtocol(@Nonnull String protocol) {
 		impl.addProtocol(protocol);
 	}
 	
@@ -191,11 +194,11 @@ public class JSONWebSocketClient {
      * Remove a protocol from {@code Sec-WebSocket-Protocol}.
      *
      * @param protocol
-     *         A protocol name. {@code null} is silently ignored.
+     *         A protocol name
      *
 	 * @see com.neovisionaries.ws.client.WebSocket#removeProtocol
      */
-	public void removeProtocol(String protocol) {
+	public void removeProtocol(@Nonnull String protocol) {
 		impl.removeProtocol(protocol);
 	}
 	
@@ -212,15 +215,14 @@ public class JSONWebSocketClient {
      * Add a pair of extra HTTP header.
      *
      * @param name
-     *         An HTTP header name. When {@code null} or an empty
-     *         string is given, no header is added.
+     *         An HTTP header name.
      *
      * @param value
      *         The value of the HTTP header.
      *
 	 * @see com.neovisionaries.ws.client.WebSocket#addHeader
      */
-	public void addHeader(String name, String value) {
+	public void addHeader(@Nonnull String name, @Nonnull String value) {
 		impl.addHeader(name, value);
 	}
 	
@@ -228,11 +230,11 @@ public class JSONWebSocketClient {
      * Remove pairs of extra HTTP headers.
      *
      * @param name
-     *         An HTTP header name. {@code null} is silently ignored.
+     *         An HTTP header name.
      *
 	 * @see com.neovisionaries.ws.client.WebSocket#removeHeaders
      */
-	public void removeHeader(String name) {
+	public void removeHeader(@Nonnull String name) {
 		impl.removeHeader(name);
 	}
 	
@@ -256,7 +258,7 @@ public class JSONWebSocketClient {
      *
 	 * @see com.neovisionaries.ws.client.WebSocket#setUserInfo
      */
-	public void setUserInfo(String username, String password) {
+	public void setUserInfo(@Nonnull String username, @Nonnull String password) {
 		impl.setUserInfo(username, password);
 	}
 	
@@ -324,7 +326,7 @@ public class JSONWebSocketClient {
 	 * @param uri the URI to connect to
 	 * @throws IOException if an I/O error occurs
 	 */
-	public void connect(String uri) throws URISyntaxException, IOException {
+	public void connect(@Nonnull String uri) throws URISyntaxException, IOException {
 		connect(new URI(uri));
 	}
 	
@@ -334,7 +336,7 @@ public class JSONWebSocketClient {
 	 * @param uri the URI to connect to
 	 * @throws IOException if an I/O error occurs
 	 */
-	public void connect(URI uri) throws IOException {
+	public void connect(@Nonnull URI uri) throws IOException {
 		impl.connect(uri);
 	}
 	
@@ -351,7 +353,7 @@ public class JSONWebSocketClient {
 	 * @param code   the close code to end the session with
 	 * @param reason the reason the session is being ended
 	 */
-	public void disconnect(CloseCode code, String reason) {
+	public void disconnect(@Nonnull CloseCode code, @Nonnull String reason) {
 		impl.disconnect(code, reason);
 	}
 	
@@ -362,7 +364,7 @@ public class JSONWebSocketClient {
 	 * @param reason       the reason the session is being ended
 	 * @param closeTimeout the time until the Socket is closed forcibly. This is meant to give time for the server to respond to the close request
 	 */
-	public void disconnect(CloseCode code, String reason, long closeTimeout) {
+	public void disconnect(@Nonnull CloseCode code, @Nonnull String reason, long closeTimeout) {
 		impl.disconnect(code, reason, closeTimeout);
 	}
 	
@@ -375,7 +377,8 @@ public class JSONWebSocketClient {
 	 *
 	 * @param object the JSONObject to send
 	 */
-	public boolean send(JSONObject object) {
+	public boolean send(@Nonnull JSONObject object) {
+		Objects.requireNonNull(object, "object");
 		return impl.send(object.toString(true));
 	}
 	
@@ -398,7 +401,7 @@ public class JSONWebSocketClient {
 	 *
 	 * @param data the data to ping with
 	 */
-	public void ping(byte[] data) {
+	public void ping(@Nonnull byte[] data) {
 		impl.ping(data);
 	}
 	
@@ -407,7 +410,7 @@ public class JSONWebSocketClient {
 	 *
 	 * @param data the data to ping with
 	 */
-	public void ping(ByteBuffer data) {
+	public void ping(@Nonnull ByteBuffer data) {
 		impl.ping(data);
 	}
 	
@@ -423,7 +426,7 @@ public class JSONWebSocketClient {
 	 *
 	 * @param handler the new event handler
 	 */
-	public void setHandler(JSONWebSocketHandler handler) {
+	public void setHandler(@Nullable JSONWebSocketHandler handler) {
 		this.handler.set(handler);
 	}
 	
@@ -439,7 +442,7 @@ public class JSONWebSocketClient {
 			handler.onDisconnect(this);
 	}
 	
-	private void onMessage(String message) {
+	private void onMessage(@Nonnull String message) {
 		try (JSONInputStream in = new JSONInputStream(message)) {
 			JSONObject object = in.readObject();
 			if (object == null)
@@ -452,7 +455,7 @@ public class JSONWebSocketClient {
 		}
 	}
 	
-	private void onPong(ByteBuffer data) {
+	private void onPong(@Nonnull ByteBuffer data) {
 		JSONWebSocketHandler handler = this.handler.get();
 		if (handler != null)
 			handler.onPong(this, data);
@@ -464,7 +467,7 @@ public class JSONWebSocketClient {
 			handler.onPongTimed(this, rttNano);
 	}
 	
-	private void onError(Throwable t) {
+	private void onError(@Nonnull Throwable t) {
 		JSONWebSocketHandler handler = this.handler.get();
 		if (handler != null)
 			handler.onError(this, t);

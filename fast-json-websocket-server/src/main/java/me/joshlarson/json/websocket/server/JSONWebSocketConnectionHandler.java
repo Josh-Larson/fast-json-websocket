@@ -2,6 +2,7 @@ package me.joshlarson.json.websocket.server;
 
 import me.joshlarson.json.JSONObject;
 
+import javax.annotation.Nonnull;
 import java.nio.ByteBuffer;
 
 public abstract class JSONWebSocketConnectionHandler {
@@ -11,7 +12,7 @@ public abstract class JSONWebSocketConnectionHandler {
 	 *
 	 * @param socket the socket that was connected
 	 */
-	public void onConnect(JSONWebSocketConnection socket) {
+	public void onConnect(@Nonnull JSONWebSocketConnection socket) {
 		
 	}
 	
@@ -20,7 +21,7 @@ public abstract class JSONWebSocketConnectionHandler {
 	 *
 	 * @param socket the socket that was disconnected
 	 */
-	public void onDisconnect(JSONWebSocketConnection socket) {
+	public void onDisconnect(@Nonnull JSONWebSocketConnection socket) {
 		
 	}
 	
@@ -30,7 +31,7 @@ public abstract class JSONWebSocketConnectionHandler {
 	 * @param socket the socket that the message arrived from
 	 * @param object the JSONObject received
 	 */
-	public void onMessage(JSONWebSocketConnection socket, JSONObject object) {
+	public void onMessage(@Nonnull JSONWebSocketConnection socket, @Nonnull JSONObject object) {
 		
 	}
 	
@@ -40,7 +41,7 @@ public abstract class JSONWebSocketConnectionHandler {
 	 * @param socket the socket that was pinged
 	 * @param data   the data from the pong
 	 */
-	public void onPong(JSONWebSocketConnection socket, ByteBuffer data) {
+	public void onPong(@Nonnull JSONWebSocketConnection socket, @Nonnull ByteBuffer data) {
 		
 	}
 	
@@ -50,7 +51,7 @@ public abstract class JSONWebSocketConnectionHandler {
 	 * @param socket  the socket that was pinged
 	 * @param rttNano the round trip time in nanoseconds
 	 */
-	public void onPongTimed(JSONWebSocketConnection socket, long rttNano) {
+	public void onPongTimed(@Nonnull JSONWebSocketConnection socket, long rttNano) {
 		
 	}
 	
@@ -61,7 +62,7 @@ public abstract class JSONWebSocketConnectionHandler {
 	 * @param socket the socket that the error occured on
 	 * @param t      the throwable thrown
 	 */
-	public void onError(JSONWebSocketConnection socket, Throwable t) {
+	public void onError(@Nonnull JSONWebSocketConnection socket, @Nonnull Throwable t) {
 		
 	}
 	

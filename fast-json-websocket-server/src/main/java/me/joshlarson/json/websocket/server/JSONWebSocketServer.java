@@ -4,6 +4,7 @@ import org.nanohttpd.protocols.http.IHTTPSession;
 import org.nanohttpd.protocols.websockets.NanoWSD;
 import org.nanohttpd.protocols.websockets.WebSocket;
 
+import javax.annotation.Nonnull;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.concurrent.atomic.AtomicReference;
@@ -17,16 +18,16 @@ public class JSONWebSocketServer extends NanoWSD {
 		this.handler = new AtomicReference<>(null);
 	}
 	
-	public JSONWebSocketServer(String hostname, int port) {
+	public JSONWebSocketServer(@Nonnull String hostname, int port) {
 		super(hostname, port);
 		this.handler = new AtomicReference<>(null);
 	}
 	
-	public JSONWebSocketServer(InetAddress address, int port) {
+	public JSONWebSocketServer(@Nonnull InetAddress address, int port) {
 		this(address.getHostAddress(), port);
 	}
 	
-	public JSONWebSocketServer(InetSocketAddress address) {
+	public JSONWebSocketServer(@Nonnull InetSocketAddress address) {
 		this(address.getAddress(), address.getPort());
 	}
 	
@@ -40,7 +41,7 @@ public class JSONWebSocketServer extends NanoWSD {
 	}
 	
 	@Override
-	protected final WebSocket openWebSocket(IHTTPSession ihttpSession) {
+	protected final WebSocket openWebSocket(@Nonnull IHTTPSession ihttpSession) {
 		return new JSONWebSocketConnectionImpl(ihttpSession, handler);
 	}
 	

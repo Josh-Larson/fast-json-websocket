@@ -10,6 +10,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
+import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -56,7 +57,7 @@ public class TestJSONWebSocketServer extends TestJSONWebSocket {
 		final AtomicLong startTime = new AtomicLong(-1);
 		server.setHandler(new DefaultServerHandler() {
 			@Override
-			public void onMessage(JSONWebSocketConnection socket, JSONObject object) {
+			public void onMessage(@Nonnull JSONWebSocketConnection socket, @Nonnull JSONObject object) {
 				startTime.set(System.nanoTime());
 				try {
 					socket.pingTimed();
@@ -66,7 +67,7 @@ public class TestJSONWebSocketServer extends TestJSONWebSocket {
 				}
 			}
 			@Override
-			public void onPongTimed(JSONWebSocketConnection socket, long rttNano) {
+			public void onPongTimed(@Nonnull JSONWebSocketConnection socket, long rttNano) {
 				long rx = System.nanoTime();
 				validPong.set(Math.abs((rx - startTime.get()) - rttNano) <= 1E6); // within 1ms of measured
 				receivedPong.set(true);
@@ -186,7 +187,13 @@ public class TestJSONWebSocketServer extends TestJSONWebSocket {
 					socket.setUserData(userData);
 					return;
 				}
-				failed.set(((AtomicInteger) socket.getUserData()).get() != 18000);
+				AtomicInteger userData = (AtomicInteger) socket.getUserData();
+				if (userData == null) {
+					failed.set(true);
+					System.err.println("User Data was not set!");
+					return;
+				}
+				failed.set(userData.get() != 18000);
 				completed.set(true);
 			}
 		};

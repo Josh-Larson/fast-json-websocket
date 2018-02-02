@@ -4,7 +4,10 @@ import me.joshlarson.json.JSONObject;
 import org.nanohttpd.protocols.http.IHTTPSession;
 import org.nanohttpd.protocols.websockets.CloseCode;
 
+import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
 import java.io.IOException;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -36,6 +39,7 @@ public class JSONWebSocketConnection {
 	 * 
 	 * @return the handshake request
 	 */
+	@Nonnull
 	public IHTTPSession getHandshakeRequest() {
 		return impl.getHandshakeRequest();
 	}
@@ -72,6 +76,7 @@ public class JSONWebSocketConnection {
 	 *
 	 * @return the data associated with this connection
 	 */
+	@CheckForNull
 	public Object getUserData() {
 		return userData.get();
 	}
@@ -92,7 +97,7 @@ public class JSONWebSocketConnection {
 	 * @param reason the reason the session is being ended
 	 * @throws IOException if an I/O error occurs
 	 */
-	public void close(CloseCode code, String reason) throws IOException {
+	public void close(@Nonnull CloseCode code, @Nonnull String reason) throws IOException {
 		impl.close(code, reason, false);
 	}
 	
@@ -120,7 +125,7 @@ public class JSONWebSocketConnection {
 	 * @param data the data to ping with
 	 * @throws IOException if an I/O error occurs
 	 */
-	public void ping(byte[] data) throws IOException {
+	public void ping(@Nonnull byte[] data) throws IOException {
 		impl.ping(data);
 	}
 	
@@ -134,7 +139,8 @@ public class JSONWebSocketConnection {
 	 * @param object the JSONObject to send
 	 * @throws IOException if an I/O error occurs   
 	 */
-	public void send(JSONObject object) throws IOException {
+	public void send(@Nonnull JSONObject object) throws IOException {
+		Objects.requireNonNull(object, "object");
 		impl.send(object.toString(true));
 	}
 	
